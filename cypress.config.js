@@ -9,5 +9,6 @@ module.exports = defineConfig({
     chromeWebSecurity: false,
     experimentalSessionAndOrigin: true, // Use only this one
     sameSite: "no_restriction",
+    experimentalStudio: true,
   },
 });
