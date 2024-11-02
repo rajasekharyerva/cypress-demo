@@ -1,18 +1,41 @@
 name: Cypress Tests
 
-on: push
+on:
+  workflow_dispatch: # Allows manual trigger of the workflow
 
 jobs:
-  cypress-run:
-    runs-on: ubuntu-22.04
+  test:
+    runs-on: ubuntu-latest # Use the latest version of Ubuntu
+
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      # Install npm dependencies, cache them correctly
-      # and run all Cypress tests
-      - name: Cypress run
-        uses: cypress-io/github-action@v6
+      - name: Checkout code
+        uses: actions/checkout@v3 # Checkout the code from the repository
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3 # Set up Node.js environment
         with:
-          build: npm run build
-          start: npm start
-          browser: chrome
+          node-version: '16' # Specify the version of Node.js
+
+      - name: Install dependencies
+        run: npm install # Install project dependencies
+
+      - name: Run Cypress tests
+        uses: cypress-io/github-action@v6 # Run Cypress tests
+        with:
+          browser: chrome # Specify which browser to use
+          wait-on: 'https://example.cypress.io' # Wait for the specified URL
+          wait-on-timeout: 60 # Timeout for waiting on the URL
+
+      - name: Upload Cypress screenshots (if tests fail)
+        if: failure() # Only run this step if the previous steps failed
+        uses: actions/upload-artifact@v3 # Upload screenshots as artifacts
+        with:
+          name: cypress-screenshots # Name for the uploaded artifact
+          path: cypress/screenshots # Path to the screenshots
+
+      - name: Upload Cypress videos (if tests fail)
+        if: failure() # Only run this step if the previous steps failed
+        uses: actions/upload-artifact@v3 # Upload videos as artifacts
+        with:
+          name: cypress-videos # Name for the uploaded artifact
+          path: cypress/videos # Path to the videos
